@@ -1,14 +1,19 @@
 using UnityEditor.Timeline;
 using UnityEngine;
+using UnityEngine.InputSystem.Processors;
 
 public class Enemy : MonoBehaviour
 {
     public float speed;
+    public float health;
+    public float maxHealth;
+    public RuntimeAnimatorController[] animCon;
     public Rigidbody2D target;
 
-    bool bLive = true;
+    bool bLive;
 
     Rigidbody2D rigid;
+    Animator anim;
     SpriteRenderer spriter;
 
 
@@ -16,6 +21,7 @@ public class Enemy : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody2D>();
         spriter = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -45,5 +51,42 @@ public class Enemy : MonoBehaviour
     private void OnEnable()
     {
         target = GameManager.instance.player.GetComponent<Rigidbody2D>();
+        bLive = true;
+        health = maxHealth;
+    }
+
+    // 레벨링에 따른 몬스터의 상태를 직접 컨트롤 할 수 있게 됨
+    public void Init(SpawnData data)
+    {
+        anim.runtimeAnimatorController = animCon[data.spriteType];
+        speed = data.speed;
+        maxHealth = data.health;
+        health = data.health;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {   
+        // Bullet 이랑 안 닿았다
+        if (!collision.CompareTag("Bullet"))
+        {
+            return;
+        }
+
+        health -= collision.GetComponent<Bullet>().damage;
+
+        if (health > 0)
+        {
+            // Live, Hit Action
+        }
+        else
+        {
+            // Die
+            Dead();
+        }
+    }
+
+    void Dead()
+    {
+        gameObject.SetActive(false);
     }
 }
