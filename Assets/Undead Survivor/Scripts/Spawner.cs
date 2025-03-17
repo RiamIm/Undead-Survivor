@@ -18,7 +18,7 @@ public class Spawner : MonoBehaviour
     {
         timer += Time.deltaTime;
         // 소수점 아래는 버리고 int 형으로 바꾸는 함수
-        level = Mathf.FloorToInt(GameManager.instance.gameTime / 10f);
+        level = Mathf.Min(Mathf.FloorToInt(GameManager.instance.gameTime / 10f), spawnData.Length - 1);
 
         if (timer > spawnData[level].spawnTime)
         {

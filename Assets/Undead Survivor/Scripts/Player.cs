@@ -5,6 +5,8 @@ public class Player : MonoBehaviour
 {
     public float speed;
     public Vector2 inputVector;
+    // 플레이어 스크립트에서 검색 클래스 타입 변수 선언 및 초기화
+    public Scanner scanner;
 
     Rigidbody2D rigid;
     SpriteRenderer spriter;
@@ -15,6 +17,7 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        scanner = GetComponent<Scanner>();
     }
 
     void FixedUpdate()

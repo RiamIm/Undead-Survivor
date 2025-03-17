@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.InputSystem.Processors;
@@ -13,20 +14,23 @@ public class Enemy : MonoBehaviour
     bool bLive;
 
     Rigidbody2D rigid;
+    Collider2D coll;
     Animator anim;
     SpriteRenderer spriter;
-
+    WaitForFixedUpdate wait;
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
+        coll = GetComponent<Collider2D>();
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        wait = new WaitForFixedUpdate();
     }
 
     private void FixedUpdate()
     {
-        if (!bLive)
+        if (!bLive || anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
         {
             return;
         }
@@ -52,6 +56,10 @@ public class Enemy : MonoBehaviour
     {
         target = GameManager.instance.player.GetComponent<Rigidbody2D>();
         bLive = true;
+        coll.enabled = true;
+        rigid.simulated = true;
+        spriter.sortingOrder = 2;
+        anim.SetBool("Dead", false);
         health = maxHealth;
     }
 
@@ -67,22 +75,37 @@ public class Enemy : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {   
         // Bullet 이랑 안 닿았다
-        if (!collision.CompareTag("Bullet"))
+        if (!collision.CompareTag("Bullet") || !bLive)
         {
             return;
         }
 
         health -= collision.GetComponent<Bullet>().damage;
+        StartCoroutine(KnockBack());
 
         if (health > 0)
         {
-            // Live, Hit Action
+            anim.SetTrigger("Hit");
         }
         else
         {
-            // Die
-            Dead();
+            bLive = false;
+            coll.enabled = false;
+            rigid.simulated = false;
+            spriter.sortingOrder = 1;
+            anim.SetBool("Dead", true);
+            GameManager.instance.kill++;
+            GameManager.instance.GetExp();
         }
+    }
+
+    // 생명 주기와 비동기처럼 실행되는 함수
+    IEnumerator KnockBack()
+    {
+        yield return wait; // 다음 하나의 물리 프레임 딜레이
+        Vector3 playerPos = GameManager.instance.player.transform.position;
+        Vector3 dirVector = transform.position - playerPos;
+        rigid.AddForce(dirVector.normalized * 3, ForceMode2D.Impulse);
     }
 
     void Dead()

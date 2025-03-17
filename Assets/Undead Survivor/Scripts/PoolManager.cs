@@ -37,7 +37,7 @@ public class PoolManager : MonoBehaviour
             }
         }
 
-        if (select == null)
+        if (!select)
         {
             // 못 찾았으면? 새롭게 생성하고 select 변수에 할당
             // Instantiate: 원본 오브젝트를 복제하여 장면에 생성하는 함수
