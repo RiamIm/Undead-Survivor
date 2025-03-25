@@ -20,6 +20,11 @@ public class Weapon : MonoBehaviour
 
     private void Update()
     {
+        if (!GameManager.instance.bLive)
+        {
+            return;
+        }
+
         switch (id)
         {
             case 0:
@@ -91,6 +96,11 @@ public class Weapon : MonoBehaviour
             default:
                 break;
         }
+
+        // Hand Set
+        Hand hand = player.hands[(int)data.itemType];
+        hand.spriter.sprite = data.hand;
+        hand.gameObject.SetActive(true);
 
         // 특정 함수 호출을 모든 자식에게 방송하는 함수
         player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);

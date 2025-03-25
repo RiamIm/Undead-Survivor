@@ -17,6 +17,7 @@ public class ItemData : ScriptableObject // 다양한 데이터를 저장하는 에셋
     public EItemType itemType;
     public int itemId;
     public string itemName;
+    [TextArea]
     public string itemDesc;
     public Sprite itemIcon;
 
@@ -28,4 +29,5 @@ public class ItemData : ScriptableObject // 다양한 데이터를 저장하는 에셋
 
     [Header("# Weapon")]
     public GameObject projectile;
+    public Sprite hand;
 }
